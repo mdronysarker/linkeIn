@@ -1,7 +1,22 @@
+import {
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from "react-router-dom";
+import Login from "./pages/Login";
+
 function App() {
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <Route>
+        <Route path="/login" element={<Login />} />
+      </Route>
+    )
+  );
   return (
     <>
-      <h1>hii</h1>
+      <RouterProvider router={router} />
     </>
   );
 }
