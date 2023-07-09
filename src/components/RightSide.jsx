@@ -30,6 +30,10 @@ const RightSide = () => {
               </div>
             </li>
           </FeedList>
+          <Recommendation>
+            View all recommendation
+            <img src="/images/right-icon.svg" alt="" />
+          </Recommendation>
         </FollowCard>
       </Container>
     </>
@@ -63,6 +67,7 @@ const Title = styled.div`
 
 const FeedList = styled.ul`
   margin-top: 16px;
+  text-align: left;
 
   li {
     display: flex;
@@ -84,9 +89,11 @@ const FeedList = styled.ul`
     max-width: 480px;
     text-align: center;
     outline: none;
+    margin-left: 6px;
 
     &:last-child {
       margin-top: 11px;
+      margin-bottom: 11px;
     }
   }
 `;
@@ -99,6 +106,13 @@ const Avatar = styled.div`
   // height:48px;
   // margin-right:8px;
   // background-position:center;
+`;
+
+const Recommendation = styled.div`
+  display: flex;
+  color: #0a66c2;
+  align-items: center;
+  font-size: 14px;
 `;
 
 export default RightSide;
