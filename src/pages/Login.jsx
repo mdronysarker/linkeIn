@@ -2,16 +2,20 @@ import React from "react";
 import styled from "styled-components";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginUsers } from "../features/Slice/LoginSlice";
 
 const Login = () => {
   const auth = getAuth();
   const googleprovider = new GoogleAuthProvider();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleGoogleauth = () => {
     signInWithPopup(auth, googleprovider)
       .then(({ user }) => {
-        console.log(user);
+        // console.log(user);
+        dispatch(loginUsers(user));
         setTimeout(() => {
           navigate("/");
         }, 1600);
