@@ -16,6 +16,7 @@ const Login = () => {
       .then(({ user }) => {
         // console.log(user);
         dispatch(loginUsers(user));
+        localStorage.setItem("items", JSON.stringify(user));
         setTimeout(() => {
           navigate("/");
         }, 1600);
