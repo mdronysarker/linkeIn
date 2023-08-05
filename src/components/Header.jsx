@@ -1,7 +1,28 @@
 import React from "react";
 import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
+import { getAuth, signOut } from "firebase/auth";
+import { loginUsers } from "../features/Slice/LoginSlice";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const user = useSelector((users) => users.login.loggedIn);
+  const auth = getAuth();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        localStorage.removeItem(user);
+        dispatch(loginUsers(null));
+        navigate("/login");
+      })
+      .catch((eror) => {
+        console.log(eror.code);
+      });
+  };
+
   return (
     <>
       <Container>
@@ -56,11 +77,19 @@ const Header = () => {
               </NavList>
               <User>
                 <a>
-                  <img src="../images/user.svg" alt="alternative" />
-                  <span>Me</span>
-                  <img src="../images/down-icon.svg" alt="alternative" />
+                  <img
+                    src={user.photoURL || "./images/profile-pic.jpg"}
+                    onError={(e) => {
+                      e.target.src = "./images/profile-pic.jpg";
+                    }}
+                    alt=""
+                  />
+                  <span>
+                    Me
+                    <img src="../images/down-icon.svg" alt="alternative" />
+                  </span>
                 </a>
-                <SignOut>
+                <SignOut onClick={handleLogout}>
                   <a>Sign Out</a>
                 </SignOut>
               </User>
