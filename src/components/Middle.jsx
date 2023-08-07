@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { styled } from "styled-components";
 import { BsCalendarEvent } from "react-icons/bs";
 import { HiPhotograph } from "react-icons/hi";
@@ -9,8 +9,15 @@ import { FcLike } from "react-icons/fc";
 import { BsSend } from "react-icons/bs";
 import { BsFillPlayBtnFill } from "react-icons/bs";
 import { BsThreeDots } from "react-icons/bs";
+import PostModal from "./PostModal";
 
-const Middle = () => {
+const Middle = (props) => {
+  const [showModal, setShowModal] = useState(false);
+
+  const handleClick = () => {
+    showModal === false ? setShowModal(true) : setShowModal(false);
+  };
+
   return (
     <>
       <Container>
@@ -18,7 +25,7 @@ const Middle = () => {
           share
           <div>
             <img src="/images/user.svg" alt="" />
-            <button>Start a post</button>
+            <button onClick={handleClick}>Start a post</button>
           </div>
           <div>
             <button>
@@ -92,6 +99,7 @@ const Middle = () => {
             </SocialActions>
           </Articale>
         </div>
+        <PostModal showModal={showModal} handleClick={handleClick} />
       </Container>
     </>
   );

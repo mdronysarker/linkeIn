@@ -1,7 +1,9 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { styled } from "styled-components";
 
 const LeftSide = () => {
+  const user = useSelector((users) => users.login.loggedIn);
   return (
     <>
       <Container>
@@ -10,7 +12,7 @@ const LeftSide = () => {
             <CardBackground />
             <a>
               <Photo />
-              <Link>Welcome, there</Link>
+              <Link>Welcome, {user.displayName}</Link>
             </a>
             <a>
               <AddPhotoText>Add a photo</AddPhotoText>

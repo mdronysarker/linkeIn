@@ -14,7 +14,7 @@ const Header = () => {
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
-        localStorage.removeItem(user);
+        localStorage.removeItem("items");
         dispatch(loginUsers(null));
         navigate("/login");
       })
@@ -78,9 +78,9 @@ const Header = () => {
               <User>
                 <a>
                   <img
-                    src={user.photoURL || "./images/profile-pic.jpg"}
+                    src={user.photoURL || "./images/user.svg"}
                     onError={(e) => {
-                      e.target.src = "./images/profile-pic.jpg";
+                      e.target.src = "./images/user.svg";
                     }}
                     alt=""
                   />
