@@ -11,10 +11,14 @@ const PostModal = (props) => {
   const [editorText, setEditorText] = useState("");
   const [shareImage, setShareImage] = useState("");
   const [vedioLink, setVedioLink] = useState("");
+  const [assetArea, setAssetArea] = useState("");
 
   const reset = () => {
     setEditorText("");
     props.handleClick();
+    setShareImage("");
+    setVedioLink("");
+    setAssetArea("");
   };
 
   const handleChnage = (e) => {
@@ -29,6 +33,12 @@ const PostModal = (props) => {
   };
 
   // console.log(shareImage);
+
+  const swichAssetArea = (area) => {
+    setShareImage("");
+    setVedioLink("");
+    setAssetArea(area);
+  };
 
   return (
     <>
@@ -53,38 +63,45 @@ const PostModal = (props) => {
                   placeholder="what do you wnat to talk about ?"
                   onFocus={true}
                 />
-                <UploadImage>
-                  <input
-                    type="file"
-                    accept="image/gif, image/png , image/jpeg"
-                    name="image"
-                    id="file"
-                    style={{ display: "none" }}
-                    onChange={handleChnage}
-                  />
-                  <p>
-                    <label htmlFor="file">Select an image to share</label>
-                  </p>
-                  {shareImage && <img src={URL.createObjectURL(shareImage)} />}
-                  <>
+                {assetArea === "image" ? (
+                  <UploadImage>
                     <input
-                      type="text"
-                      placeholder="please input a video link"
-                      onChange={(e) => setVedioLink(e.target.value)}
+                      type="file"
+                      accept="image/gif, image/png , image/jpeg"
+                      name="image"
+                      id="file"
+                      style={{ display: "none" }}
+                      onChange={handleChnage}
                     />
-                    {vedioLink && (
-                      <ReactPlayer url={vedioLink} width={"100%"} />
+                    <p>
+                      <label htmlFor="file">Select an image to share</label>
+                    </p>
+                    {shareImage && (
+                      <img src={URL.createObjectURL(shareImage)} />
                     )}
-                  </>
-                </UploadImage>
+                  </UploadImage>
+                ) : (
+                  assetArea === "media" && (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="please input a video link"
+                        onChange={(e) => setVedioLink(e.target.value)}
+                      />
+                      {vedioLink && (
+                        <ReactPlayer url={vedioLink} width={"100%"} />
+                      )}
+                    </>
+                  )
+                )}
               </Editor>
             </ShareContent>
             <ShareCreation>
               <AttachAssets>
-                <AsseButton>
+                <AsseButton onClick={() => swichAssetArea("image")}>
                   <GrGallery />
                 </AsseButton>
-                <AsseButton>
+                <AsseButton onClick={() => swichAssetArea("media")}>
                   <PiYoutubeLogoLight />
                 </AsseButton>
               </AttachAssets>
