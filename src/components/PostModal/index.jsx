@@ -5,14 +5,30 @@ import { ImCross } from "react-icons/im";
 import { GrGallery } from "react-icons/gr";
 import { PiYoutubeLogoLight } from "react-icons/pi";
 import { AiOutlineMessage } from "react-icons/ai";
+import ReactPlayer from "react-player";
 
 const PostModal = (props) => {
   const [editorText, setEditorText] = useState("");
+  const [shareImage, setShareImage] = useState("");
+  const [vedioLink, setVedioLink] = useState("");
 
   const reset = () => {
     setEditorText("");
     props.handleClick();
   };
+
+  const handleChnage = (e) => {
+    const image = e.target.files[0];
+
+    if (image === "" || image === undefined) {
+      alert(`not an image , the file is a ${typeof image}
+      `);
+      return;
+    }
+    setShareImage(image);
+  };
+
+  // console.log(shareImage);
 
   return (
     <>
@@ -21,7 +37,7 @@ const PostModal = (props) => {
           <Content>
             <Header>
               <h2>Create a post</h2>
-              <button onClick={props.handleClick}>
+              <button onClick={reset}>
                 <ImCross />
               </button>
             </Header>
@@ -36,7 +52,31 @@ const PostModal = (props) => {
                   onChange={(e) => setEditorText(e.target.value)}
                   placeholder="what do you wnat to talk about ?"
                   onFocus={true}
-                ></textarea>
+                />
+                <UploadImage>
+                  <input
+                    type="file"
+                    accept="image/gif, image/png , image/jpeg"
+                    name="image"
+                    id="file"
+                    style={{ display: "none" }}
+                    onChange={handleChnage}
+                  />
+                  <p>
+                    <label htmlFor="file">Select an image to share</label>
+                  </p>
+                  {shareImage && <img src={URL.createObjectURL(shareImage)} />}
+                  <>
+                    <input
+                      type="text"
+                      placeholder="please input a video link"
+                      onChange={(e) => setVedioLink(e.target.value)}
+                    />
+                    {vedioLink && (
+                      <ReactPlayer url={vedioLink} width={"100%"} />
+                    )}
+                  </>
+                </UploadImage>
               </Editor>
             </ShareContent>
             <ShareCreation>
@@ -55,7 +95,9 @@ const PostModal = (props) => {
                 </AsseButton>
               </ShareComment>
 
-              <PostButton>Post</PostButton>
+              <PostButton disabled={!editorText ? true : false}>
+                Post
+              </PostButton>
             </ShareCreation>
           </Content>
         </Container>
@@ -188,7 +230,7 @@ const PostButton = styled.button`
   border-radius: 20px;
   padding-left: 16px;
   padding-right: 16px;
-  background: #0a66c2;
+  background: ${(props) => (props.disabled ? "rgba(0,0,0,0.8)" : "#0a66c2")};
   color: white;
 
   &:hover {
@@ -209,6 +251,13 @@ const Editor = styled.div`
     height: 35px;
     font-size: 16px;
     margin-bottom: 20px;
+  }
+`;
+
+const UploadImage = styled.div`
+  text-align: center;
+  img {
+    width: 100%;
   }
 `;
 
