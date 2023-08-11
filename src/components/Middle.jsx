@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import { BsCalendarEvent } from "react-icons/bs";
 import { HiPhotograph } from "react-icons/hi";
@@ -10,13 +10,36 @@ import { BsSend } from "react-icons/bs";
 import { BsFillPlayBtnFill } from "react-icons/bs";
 import { BsThreeDots } from "react-icons/bs";
 import PostModal from "./PostModal";
+import { getDatabase, ref, onValue } from "firebase/database";
+import { useSelector } from "react-redux";
 
 const Middle = (props) => {
   const [showModal, setShowModal] = useState(false);
+  const [storePost, setStorePost] = useState([]);
+
+  const db = getDatabase();
+  const user = useSelector((users) => users.login.loggedIn);
 
   const handleClick = () => {
     showModal === false ? setShowModal(true) : setShowModal(false);
   };
+
+  // Read post
+
+  useEffect(() => {
+    const starCountRef = ref(db, "post");
+    onValue(starCountRef, (snapshot) => {
+      const singlePost = [];
+      snapshot.forEach((item) => {
+        if (user.uid === item.val().whoPostId) {
+          singlePost.push(item.val());
+        }
+      });
+      setStorePost(singlePost);
+    });
+  }, [db, user.uid]);
+
+  // console.log(storePost);
 
   return (
     <>
@@ -24,7 +47,7 @@ const Middle = (props) => {
         <ShareBox>
           share
           <div>
-            <img src="/images/user.svg" alt="" />
+            <img src={user.photoURL || "./images/user.svg"} alt="" />
             <button onClick={handleClick}>Start a post</button>
           </div>
           <div>
@@ -47,57 +70,62 @@ const Middle = (props) => {
           </div>
         </ShareBox>
         <div>
-          <Articale>
-            <ShareActor>
-              <a>
-                <img src="/images/user.svg" alt="alternative" />
-                <div>
-                  <span>Title</span>
-                  <span>Info</span>
-                  <span>Dates</span>
-                </div>
-              </a>
-              <button>
-                <BsThreeDots />
-              </button>
-            </ShareActor>
-            <Description>Description</Description>
-            <ShareImg>
-              <a>
-                <img src="/images/share-img.jpg" alt="alternative" />
-              </a>
-            </ShareImg>
-            <SocialCounts>
-              <li>
+          {storePost.map((item, i) => (
+            <Articale key={i}>
+              <ShareActor>
+                <a>
+                  <img
+                    src={item.image || "/images/user.svg"}
+                    alt="alternative"
+                  />
+                  <div>
+                    <span>{item.title}</span>
+                    <span>{item.info}</span>
+                    <span>{item.date}</span>
+                  </div>
+                </a>
+                <button>
+                  <BsThreeDots />
+                </button>
+              </ShareActor>
+              <Description>{item.description}</Description>
+              <ShareImg>
+                <a>
+                  <img src={item.shareImage} alt="alternative" />
+                </a>
+              </ShareImg>
+              <SocialCounts>
+                <li>
+                  <button>
+                    <AiOutlineLike />
+                    <FcLike />
+                    <span>71</span>
+                  </button>
+                </li>
+                <li>
+                  <a>2 comments</a>
+                </li>
+              </SocialCounts>
+              <SocialActions>
                 <button>
                   <AiOutlineLike />
-                  <FcLike />
-                  <span>71</span>
+                  <span>Like</span>
                 </button>
-              </li>
-              <li>
-                <a>2 comments</a>
-              </li>
-            </SocialCounts>
-            <SocialActions>
-              <button>
-                <AiOutlineLike />
-                <span>Like</span>
-              </button>
-              <button>
-                <FaRegComment />
-                <span>Comment</span>
-              </button>
-              <button>
-                <PiShareFatThin />
-                <span>Share</span>
-              </button>
-              <button>
-                <BsSend />
-                <span>Send</span>
-              </button>
-            </SocialActions>
-          </Articale>
+                <button>
+                  <FaRegComment />
+                  <span>Comment</span>
+                </button>
+                <button>
+                  <PiShareFatThin />
+                  <span>Share</span>
+                </button>
+                <button>
+                  <BsSend />
+                  <span>Send</span>
+                </button>
+              </SocialActions>
+            </Articale>
+          ))}
         </div>
         <PostModal showModal={showModal} handleClick={handleClick} />
       </Container>

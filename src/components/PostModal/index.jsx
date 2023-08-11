@@ -6,6 +6,15 @@ import { GrGallery } from "react-icons/gr";
 import { PiYoutubeLogoLight } from "react-icons/pi";
 import { AiOutlineMessage } from "react-icons/ai";
 import ReactPlayer from "react-player";
+import { useSelector } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
+import { getDatabase, push, ref, set } from "firebase/database";
+import {
+  getStorage,
+  ref as sref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 
 const PostModal = (props) => {
   const [editorText, setEditorText] = useState("");
@@ -13,10 +22,14 @@ const PostModal = (props) => {
   const [vedioLink, setVedioLink] = useState("");
   const [assetArea, setAssetArea] = useState("");
 
+  const user = useSelector((users) => users.login.loggedIn);
+  const storage = getStorage();
+  const db = getDatabase();
+
   const reset = () => {
     setEditorText("");
     props.handleClick();
-    setShareImage("");
+    setShareImage(null);
     setVedioLink("");
     setAssetArea("");
   };
@@ -35,9 +48,51 @@ const PostModal = (props) => {
   // console.log(shareImage);
 
   const swichAssetArea = (area) => {
-    setShareImage("");
+    setShareImage(null);
     setVedioLink("");
     setAssetArea(area);
+  };
+
+  const handleSubmitPost = () => {
+    if (!shareImage) {
+      alert("Please select an image to share.");
+      return;
+    }
+
+    const storageRef = sref(
+      storage,
+      `uploadPostImage/ ${user.uid} = ${user.uid} / ${uuidv4()}`
+    );
+
+    const uploadTask = uploadBytesResumable(storageRef, shareImage);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("Upload is " + progress + "% done");
+      },
+      (error) => {
+        console.log(error.code);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          set(push(ref(db, "post")), {
+            whoPostId: user.uid,
+            title: user.displayName,
+            info: user.email,
+            date: `${new Date().getFullYear()} - ${
+              new Date().getMonth() + 1
+            } - ${new Date().getDate()}  ${new Date().getHours()}:${new Date().getMinutes()}`,
+            description: editorText,
+            image: user.photoURL,
+            shareImage: downloadURL,
+            vedio: vedioLink,
+          });
+        });
+      }
+    );
   };
 
   return (
@@ -53,8 +108,14 @@ const PostModal = (props) => {
             </Header>
             <ShareContent>
               <UserInfo>
-                <img src="/images/user.svg" alt="" />
-                <span>Name</span>
+                <img
+                  src={user.photoURL || "./images/user.svg"}
+                  onError={(e) => {
+                    e.target.src = "./images/user.svg";
+                  }}
+                  alt=""
+                />
+                <span>{user.displayName}</span>
               </UserInfo>
               <Editor>
                 <textarea
@@ -112,7 +173,10 @@ const PostModal = (props) => {
                 </AsseButton>
               </ShareComment>
 
-              <PostButton disabled={!editorText ? true : false}>
+              <PostButton
+                disabled={!editorText ? true : false}
+                onClick={handleSubmitPost}
+              >
                 Post
               </PostButton>
             </ShareCreation>
