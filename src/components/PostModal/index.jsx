@@ -77,20 +77,24 @@ const PostModal = (props) => {
         console.log(error.code);
       },
       () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          set(push(ref(db, "post")), {
-            whoPostId: user.uid,
-            title: user.displayName,
-            info: user.email,
-            date: `${new Date().getFullYear()} - ${
-              new Date().getMonth() + 1
-            } - ${new Date().getDate()}  ${new Date().getHours()}:${new Date().getMinutes()}`,
-            description: editorText,
-            image: user.photoURL,
-            shareImage: downloadURL,
-            vedio: vedioLink,
+        getDownloadURL(uploadTask.snapshot.ref)
+          .then((downloadURL) => {
+            set(push(ref(db, "post")), {
+              whoPostId: user.uid,
+              title: user.displayName,
+              info: user.email,
+              date: `${new Date().getFullYear()} - ${
+                new Date().getMonth() + 1
+              } - ${new Date().getDate()}`,
+              description: editorText,
+              image: user.photoURL,
+              shareImage: downloadURL,
+              vedio: vedioLink,
+            });
+          })
+          .then(() => {
+            props.handleClick();
           });
-        });
       }
     );
   };
