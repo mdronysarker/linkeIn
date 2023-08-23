@@ -12,9 +12,11 @@ import { BsThreeDots } from "react-icons/bs";
 import PostModal from "./PostModal";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { useSelector } from "react-redux";
+import Comment from "./Comment";
 
 const Middle = (props) => {
   const [showModal, setShowModal] = useState(false);
+  const [showComment, setShowComment] = useState(false);
   const [storePost, setStorePost] = useState([]);
 
   const db = getDatabase();
@@ -22,6 +24,10 @@ const Middle = (props) => {
 
   const handleClick = () => {
     showModal === false ? setShowModal(true) : setShowModal(false);
+  };
+
+  const handleShowComment = () => {
+    showComment === false ? setShowComment(true) : setShowComment(false);
   };
 
   // Read post
@@ -111,7 +117,7 @@ const Middle = (props) => {
                   <AiOutlineLike />
                   <span>Like</span>
                 </button>
-                <button>
+                <button onClick={handleShowComment}>
                   <FaRegComment />
                   <span>Comment</span>
                 </button>
@@ -124,6 +130,7 @@ const Middle = (props) => {
                   <span>Send</span>
                 </button>
               </SocialActions>
+              {showComment && <Comment />}
             </Articale>
           ))}
         </div>
