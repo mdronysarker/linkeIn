@@ -18,6 +18,7 @@ const Middle = (props) => {
   const [showModal, setShowModal] = useState(false);
   const [showComment, setShowComment] = useState(false);
   const [storePost, setStorePost] = useState([]);
+  const [storeComment, setStoreComment] = useState([]);
 
   const db = getDatabase();
   const user = useSelector((users) => users.login.loggedIn);
@@ -37,13 +38,31 @@ const Middle = (props) => {
     onValue(starCountRef, (snapshot) => {
       const singlePost = [];
       snapshot.forEach((item) => {
+        // console.log(item);
+        // console.log(item.key);
         if (user.uid === item.val().whoPostId) {
-          singlePost.push(item.val());
+          singlePost.push(item);
         }
       });
       setStorePost(singlePost);
     });
   }, [db, user.uid]);
+
+  // Read Comment
+
+  useEffect(() => {
+    const starCountRef = ref(db, "comment");
+    onValue(starCountRef, (snapshot) => {
+      const commentPost = [];
+      snapshot.forEach((item) => {
+        // console.log(item.key);
+        commentPost.push(item);
+      });
+      setStoreComment(commentPost);
+    });
+  }, [db, user.uid]);
+
+  // console.log(storeComment);
 
   // console.log(storePost);
 
@@ -76,63 +95,85 @@ const Middle = (props) => {
           </div>
         </ShareBox>
         <div>
-          {storePost.map((item, i) => (
-            <Articale key={i}>
-              <ShareActor>
-                <a>
-                  <img
-                    src={item.image || "/images/user.svg"}
-                    alt="alternative"
-                  />
-                  <div>
-                    <span>{item.title}</span>
-                    <span>{item.info}</span>
-                    <span>{item.date}</span>
-                  </div>
-                </a>
-                <button>
-                  <BsThreeDots />
-                </button>
-              </ShareActor>
-              <Description>{item.description}</Description>
-              <ShareImg>
-                <a>
-                  <img src={item.shareImage} alt="alternative" />
-                </a>
-              </ShareImg>
-              <SocialCounts>
-                <li>
+          {storePost.map((items, i) => {
+            const item = items.val();
+            // console.log(item);
+            const postKey = items.key;
+            return (
+              <Articale key={i}>
+                <ShareActor>
+                  <a>
+                    <img
+                      src={item.image || "/images/user.svg"}
+                      alt="alternative"
+                    />
+                    <div>
+                      <span>{item.title}</span>
+                      <span>{item.info}</span>
+                      <span>{item.date}</span>
+                    </div>
+                  </a>
+                  <button>
+                    <BsThreeDots />
+                  </button>
+                </ShareActor>
+                <Description>{item.description}</Description>
+                <ShareImg>
+                  <a>
+                    <img src={item.shareImage} alt="alternative" />
+                  </a>
+                </ShareImg>
+                <SocialCounts>
+                  <li>
+                    <button>
+                      <AiOutlineLike />
+                      <FcLike />
+                      <span>71</span>
+                    </button>
+                  </li>
+                  <li>
+                    <a>2 comments</a>
+                  </li>
+                </SocialCounts>
+                <SocialActions>
                   <button>
                     <AiOutlineLike />
-                    <FcLike />
-                    <span>71</span>
+                    <span>Like</span>
                   </button>
-                </li>
-                <li>
-                  <a>2 comments</a>
-                </li>
-              </SocialCounts>
-              <SocialActions>
-                <button>
-                  <AiOutlineLike />
-                  <span>Like</span>
-                </button>
-                <button onClick={handleShowComment}>
-                  <FaRegComment />
-                  <span>Comment</span>
-                </button>
-                <button>
-                  <PiShareFatThin />
-                  <span>Share</span>
-                </button>
-                <button>
-                  <BsSend />
-                  <span>Send</span>
-                </button>
-              </SocialActions>
-              {showComment && <Comment />}
-            </Articale>
-          ))}
+                  <button onClick={handleShowComment}>
+                    <FaRegComment />
+                    <span>Comment</span>
+                  </button>
+                  <button>
+                    <PiShareFatThin />
+                    <span>Share</span>
+                  </button>
+                  <button>
+                    <BsSend />
+                    <span>Send</span>
+                  </button>
+                </SocialActions>
+                {storeComment.map((com, i) => {
+                  const commnet = com.val();
+                  // const commentKey = com.key;
+                  // console.log(postKey);
+                  // console.log(commentKey);
+
+                  return (
+                    <div key={i}>
+                      {postKey === commnet.id && (
+                        <div>
+                          <h3>{commnet.name}</h3>
+                          <p>{commnet.comment}</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                {showComment && <Comment postKey={postKey} />}
+              </Articale>
+            );
+          })}
         </div>
         <PostModal showModal={showModal} handleClick={handleClick} />
       </Container>
@@ -223,6 +264,7 @@ const Articale = styled(CommonCard)`
   padding: 0;
   margin: 0 0 8px;
   overflow: visible;
+  overflow-y: auto;
 `;
 
 const ShareActor = styled.div`

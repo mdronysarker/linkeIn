@@ -1,13 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { styled } from "styled-components";
 import { FaTelegramPlane } from "react-icons/fa";
+import { getDatabase, push, ref, set } from "firebase/database";
+import { useSelector } from "react-redux";
 
-const Comment = () => {
+const Comment = ({ postKey }) => {
+  const [comment, setComment] = useState("");
+  // console.log(postKey);
+
+  const db = getDatabase();
+  const user = useSelector((users) => users.login.loggedIn);
+
+  const handleComment = () => {
+    // console.log("hello");
+    set(push(ref(db, "comment")), {
+      comment: comment,
+      name: user.displayName,
+      id: postKey,
+    }).then(() => {
+      setComment("");
+    });
+  };
+
   return (
     <>
       <InputBox>
-        <input type="text" placeholder="Write here..." />
-        <FaTelegramPlane />
+        <input
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          type="text"
+          placeholder="Write here..."
+          // name={postKey}
+        />
+        <FaTelegramPlane onClick={handleComment} />
       </InputBox>
     </>
   );
